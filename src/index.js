@@ -42,7 +42,7 @@ const main = async () => {
 
   app.get('/callback', async (req, res) => {
     // Fetch linkState from user session
-    const linkState = get(req, 'session.linkState');
+    const linkState = _.get(req, 'session.linkState');
 
     // Parse relevant parameters from request URL
     const params = client.callbackParams(req);
