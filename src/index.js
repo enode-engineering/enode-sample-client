@@ -15,15 +15,19 @@ const main = async () => {
   });
 
   app.get('/connect-your-car', async (req, res) => {
-    const userId = _.get(req, "session.user.id");
+    const user = _.get(req, "session.user");
 
     // Create an Enode Link session for the user
     const clientGrant = await client.grant({grant_type: "client_credentials"});
-    const response = await got.post(`${config.get('apiUrl')}/users/${userId}/link`, {
+    const response = await got.post(`${config.get('apiUrl')}/users/${user.id}/link`, {
       headers: {
         'Authorization': `Bearer ${clientGrant.access_token}`
       },
-      responseType: "json"
+      responseType: "json",
+      json: {
+        userName: `${user.firstName} ${user.lastName}`,
+        userImage: "https://picsum.photos/id/1005/400/400.jpg"
+      }
     });
     const linkState = response.body.linkState;
 
@@ -32,7 +36,7 @@ const main = async () => {
 
     // Construct an OAuth authorization URL
     const authorizationUrl = client.authorizationUrl({
-      scope: "offline_access all",
+      scope: "offline_access all control:vehicle:charging",
       state: linkState
     });
 
@@ -48,10 +52,12 @@ const main = async () => {
     const params = client.callbackParams(req);
 
     // Exchange authorization code for access and refresh tokens
-    const tokenSet = await client.oauthCallback(config.get('callbackUrl'), params, {state: linkState})
-
-    // Boilerplate for this example
-    req.session.tokenSet = tokenSet;
+    try {
+      const tokenSet = await client.oauthCallback(config.get('callbackUrl'), params, {state: linkState})
+      req.session.tokenSet = tokenSet;
+    } catch (e) {
+      req.session.tokenSet = e;
+    }
     res.redirect("/");
   });
 
