@@ -1,0 +1,4 @@
+{
+  "ext": "ts,js,json,pug",
+  "exec": "ts-node src/index.ts"
+}

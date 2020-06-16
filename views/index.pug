@@ -1,0 +1,22 @@
+html
+  head
+    title Power Company
+  body
+    h1 🧠⚡️ Power Company
+    p You have been signed into a randomly generated user account for testing purposes.
+    h3 Authenticated User:
+    pre
+      | name: #{firstName} #{lastName}
+      | id: #{id}
+    img(src=image)
+    br
+    br
+    if tokens
+      h3 Enode Access Token:
+      pre= JSON.stringify(tokens, null, 4)
+      if tokens.refresh_token
+        form(action="/refresh" method="post")
+          input(type="hidden" name="refreshToken" value=tokens.refresh_token)
+          input(type="submit" value="Refresh Tokens")
+    a(href="/link")
+      button Connect Your Car
