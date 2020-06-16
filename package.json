@@ -1,0 +1,22 @@
+{
+  "name": "sample-client",
+  "version": "1.0.0",
+  "description": "Sample implementation of Enode API confidential client",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "config": "^3.3.1",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "faker": "^4.1.0",
+    "got": "^11.3.0",
+    "lodash": "^4.17.15",
+    "openid-client": "^3.15.2",
+    "pug": "^3.0.0"
+  }
+}

@@ -1,0 +1,14 @@
+html
+  head
+    title Power Company
+  body
+    h1 🧠⚡️ Power Company
+    h3 Authorized User:
+    pre
+      | name: #{firstName} #{lastName}
+      | id: #{id}
+    if tokens
+      h3 Access Token:
+        pre= tokens
+    a(href="/connect-your-car")
+      button Connect Your Car
