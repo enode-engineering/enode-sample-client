@@ -32,6 +32,7 @@ interface LinkUserResponseBody {
         json: {
           userName: `${user.firstName} ${user.lastName}`,
           userImage: user.image,
+          linkMultiple: true,
         },
       })
       .json();
