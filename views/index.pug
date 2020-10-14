@@ -1,6 +1,17 @@
 html
   head
     title Power Company
+    style.
+      body {
+        padding: 1rem;
+        font-family: 'Courier New', Courier, monospace;
+      }
+      h3 {
+        margin-top: 4rem;
+      }
+      img.profile {
+        width: 100px;
+      }
   body
     h1 🧠⚡️ Power Company
     p You have been signed into a randomly generated user account for testing purposes.
@@ -8,15 +19,25 @@ html
     pre
       | name: #{firstName} #{lastName}
       | id: #{id}
-    img(src=image)
+    img.profile(src=image)
     br
     br
     if tokens
-      h3 Enode Access Token:
-      pre= JSON.stringify(tokens, null, 4)
       if tokens.refresh_token
         form(action="/refresh" method="post")
           input(type="hidden" name="refreshToken" value=tokens.refresh_token)
           input(type="submit" value="Refresh Tokens")
     a(href="/link")
       button Connect Your Car
+    if tokens
+      h3 OAuth Tokens
+      pre= JSON.stringify(tokens, null, 4)
+
+    if vehicles
+      h3 Vehicles
+      each vehicle,i in vehicles
+        h4=`${vehicle.information.year} ${vehicle.information.brand} ${vehicle.information.model}`
+        pre= JSON.stringify(vehicle, null, 4)
+    if vehiclesError
+      h3 Error fetching vehicles
+      pre= vehiclesError

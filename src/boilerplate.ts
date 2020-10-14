@@ -1,7 +1,8 @@
 import express from "express";
-import session from "express-session";
+import cookieSession from "cookie-session";
 import faker from "faker";
 import path from "path";
+import { listVehicles } from "./enode";
 
 const app = express();
 app.set("view engine", "pug");
@@ -12,19 +13,21 @@ app.use(
     extended: false,
   }),
 );
+
 app.use(
-  session({
-    secret: "cookie top secret",
-    resave: false,
-    saveUninitialized: true,
+  cookieSession({
+    name: "session",
+    secret: "2EbmNv78fEqBr23ZaKzs",
+    maxAge: 24 * 60 * 60 * 1000 * 180,
+    sameSite: true,
   }),
 );
 
 app.use((req, res, next) => {
-  if (req.session === undefined || req.session.user) {
+  if (req.session?.user) {
     return next();
   }
-  req.session.user = {
+  req.session!.user = {
     id: faker.random.uuid(),
     firstName: faker.name.firstName(),
     lastName: "Nordmann",
@@ -34,12 +37,26 @@ app.use((req, res, next) => {
 });
 
 app.get("/", async (req, res) => {
+  let vehicles: any[] | null = null;
+  let vehiclesError: any = null;
+
+  if (req.session?.tokens) {
+    try {
+      vehicles = await listVehicles(req.session.tokens.access_token);
+    } catch (e) {
+      console.error(e);
+      vehiclesError = e.toString();
+    }
+  }
+
   res.render("index", {
-    id: req.session!.user.id,
-    firstName: req.session!.user.firstName,
-    lastName: req.session!.user.lastName,
-    image: req.session!.user.image,
-    tokens: req.session!.tokens,
+    id: req.session?.user.id,
+    firstName: req.session?.user.firstName,
+    lastName: req.session?.user.lastName,
+    image: req.session?.user.image,
+    tokens: req.session?.tokens,
+    vehicles,
+    vehiclesError,
   });
 });
 
