@@ -19,7 +19,7 @@ app.use(
     name: "session",
     secret: "2EbmNv78fEqBr23ZaKzs",
     maxAge: 24 * 60 * 60 * 1000 * 180,
-    sameSite: true,
+    // sameSite: true,
   }),
 );
 
