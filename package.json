@@ -20,7 +20,8 @@
     "got": "^11.3.0",
     "lodash": "^4.17.15",
     "openid-client": "^3.15.2",
-    "pug": "^3.0.0"
+    "pug": "^3.0.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/config": "0.0.36",
