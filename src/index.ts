@@ -89,6 +89,11 @@ interface LinkUserResponseBody {
     app.listen(config.get("port"), () =>
       console.log(`Server ready on port ${config.get("port")}`),
     );
+
+    app.post("/webhook", async (req, res) => {
+      console.log("[webhook]", JSON.stringify(req.body));
+      res.json({ logged: true });
+    });
   } catch (err) {
     console.log("ERROR", err);
   }
