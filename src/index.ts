@@ -12,12 +12,16 @@ interface LinkUserResponseBody {
   try {
     // Configure OAuth client library
     const enodeIssuer = await Issuer.discover(config.get("oauthUrl"));
+    console.log("*** oauthUrl:", config.get("oauthUrl"));
+    console.log("*** enodeIssuer", enodeIssuer);
+
     const client = new enodeIssuer.Client({
       client_id: config.get("clientId"),
       client_secret: config.get("clientSecret"),
       redirect_uris: [config.get("callbackUrl")],
       response_types: ["code"],
     });
+    console.log("*** client", client);
 
     app.get("/link", async (req, res) => {
       const user = req.session!.user;
