@@ -4,5 +4,6 @@
   "clientSecret": "CLIENT_SECRET",
   "apiUrl": "API_URL",
   "oauthUrl": "OAUTH_URL",
-  "callbackUrl": "CALLBACK_URL"
+  "callbackUrl": "CALLBACK_URL",
+  "webhookUrl": "WEBHOOK_URL"
 }
