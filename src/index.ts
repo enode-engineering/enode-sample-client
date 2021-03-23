@@ -8,12 +8,9 @@ interface LinkUserResponseBody {
 }
 
 (async () => {
-  console.log("Config:", config);
   try {
     // Configure OAuth client library
     const enodeIssuer = await Issuer.discover(config.get("oauthUrl"));
-    console.log("*** oauthUrl:", config.get("oauthUrl"));
-    console.log("*** enodeIssuer", enodeIssuer);
 
     const client = new enodeIssuer.Client({
       client_id: config.get("clientId"),
@@ -21,7 +18,6 @@ interface LinkUserResponseBody {
       redirect_uris: [config.get("callbackUrl")],
       response_types: ["code"],
     });
-    console.log("*** client", client);
 
     app.get("/link", async (req, res) => {
       const user = req.session!.user;
@@ -47,13 +43,16 @@ interface LinkUserResponseBody {
       // Persist linkState to user's session
       req.session!.linkState = linkState;
 
+      const reqScope = req.query.scope as string;
+      const defaultScope = "all";
+      const scope = reqScope ? reqScope.split(",").join(" ") : defaultScope;
+
       // Construct an OAuth authorization URL
       const authorizationUrl = client.authorizationUrl({
-        scope: "offline_access all control:vehicle:charging",
+        // scope: "offline_access all control:vehicle:charging",
+        scope,
         state: linkState,
       });
-
-      console.log("LINK REDIRECT", authorizationUrl);
 
       // Redirect user to authorization URL
       res.redirect(authorizationUrl);
@@ -90,14 +89,14 @@ interface LinkUserResponseBody {
       res.redirect("/");
     });
 
-    app.listen(config.get("port"), () =>
-      console.log(`Server ready on port ${config.get("port")}`),
-    );
-
     app.post("/webhook", async (req, res) => {
       console.log("[webhook]", JSON.stringify(req.body));
       res.json({ logged: true });
     });
+
+    app.listen(config.get("port"), () =>
+      console.log(`Server ready on port ${config.get("port")}`),
+    );
   } catch (err) {
     console.log("ERROR", err);
   }
