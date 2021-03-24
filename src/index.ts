@@ -44,7 +44,7 @@ interface LinkUserResponseBody {
       req.session!.linkState = linkState;
 
       const reqScope = req.query.scope as string;
-      const defaultScope = "all";
+      const defaultScope = "offline_access all";
       const scope = reqScope ? reqScope.split(",").join(" ") : defaultScope;
 
       // Construct an OAuth authorization URL
