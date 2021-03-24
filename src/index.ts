@@ -7,6 +7,13 @@ interface LinkUserResponseBody {
   linkState: string;
 }
 
+interface LinkSessionDetails {
+  userName: string;
+  userImage: string;
+  linkMultiple: boolean;
+  forceLanguage?: string;
+}
+
 (async () => {
   try {
     // Configure OAuth client library
@@ -22,20 +29,29 @@ interface LinkUserResponseBody {
     app.get("/link", async (req, res) => {
       const user = req.session!.user;
 
+      const validLangs = ["en", "nb", "de", "sv"];
+      const queryLang = req.query.lang as string;
+
       // Create an Enode Link session for the user
       const clientGrant = await client.grant({
         grant_type: "client_credentials",
       });
+
+      const linkSessionDetails: LinkSessionDetails = {
+        userName: `${user.firstName} ${user.lastName}`,
+        userImage: user.image,
+        linkMultiple: false,
+      };
+      if (queryLang && validLangs.includes(queryLang)) {
+        linkSessionDetails.forceLanguage = queryLang;
+      }
+
       const body: LinkUserResponseBody = await got
         .post(`${config.get("apiUrl")}/users/${user.id}/link`, {
           headers: {
             Authorization: `Bearer ${clientGrant.access_token}`,
           },
-          json: {
-            userName: `${user.firstName} ${user.lastName}`,
-            userImage: user.image,
-            linkMultiple: false,
-          },
+          json: linkSessionDetails,
         })
         .json();
       const linkState = body.linkState;
