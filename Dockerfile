@@ -13,8 +13,8 @@ COPY views views
 FROM node:lts-buster as base-dev
 COPY --from=base /sample-client /sample-client
 WORKDIR /sample-client
-COPY docker_utils/npmrc .npmrc
 ARG GH_TOKEN
+RUN echo -e "@enode-engineering:registry=https://npm.pkg.github.com/\n//npm.pkg.github.com/:_authToken=\${GH_TOKEN}" > .npmrc
 RUN npm ci && rm .npmrc
 
 FROM node:lts-buster as dev
