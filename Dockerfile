@@ -14,7 +14,7 @@ FROM node:lts-buster as base-dev
 COPY --from=base /sample-client /sample-client
 WORKDIR /sample-client
 ARG GH_TOKEN
-RUN echo -e "@enode-engineering:registry=https://npm.pkg.github.com/\n//npm.pkg.github.com/:_authToken=\${GH_TOKEN}" > .npmrc
+RUN echo "@enode-engineering:registry=https://npm.pkg.github.com/\n//npm.pkg.github.com/:_authToken=\${GH_TOKEN}" > .npmrc
 RUN npm ci && rm .npmrc
 
 FROM node:lts-buster as dev
