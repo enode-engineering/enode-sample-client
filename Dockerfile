@@ -19,6 +19,7 @@ RUN npm ci && rm .npmrc
 
 FROM node:lts-buster as dev
 COPY --from=base-dev /sample-client /sample-client
+COPY ./docker_utils/wait-for-it.sh /usr/bin/wait-for-it.sh
 WORKDIR /sample-client
 
 FROM node:lts-buster as base-prod

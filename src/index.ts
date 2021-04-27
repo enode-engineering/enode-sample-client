@@ -14,14 +14,50 @@ interface LinkSessionDetails {
   forceLanguage?: string;
 }
 
+async function createClient() {
+  const adminUser = config.get("adminUser");
+  const adminPass = config.get("adminPass");
+
+  const clientData = {
+    displayName: "CleanEnergy Inc",
+    customerName: "CleanEnergy Inc",
+    featureFlags: {},
+    redirectUris: [config.get("callbackUrl")],
+    secret: "some-secret",
+  };
+
+  return got
+    .post(`${config.get("apiUrl")}/admin/clients`, {
+      headers: {
+        Authorization: `Basic ${Buffer.from(
+          `${adminUser}:${adminPass}`,
+        ).toString("base64")}`,
+      },
+      json: clientData,
+    })
+    .json();
+}
+
 (async () => {
+  let client_id: string;
+  let client_secret: string;
+
+  if (config.has("selfProvision")) {
+    const clientDetails: any = await createClient();
+    client_id = clientDetails.id;
+    client_secret = clientDetails.secret;
+  } else {
+    client_id = config.get("clientId");
+    client_secret = config.get("clientSecret");
+  }
+
   try {
     // Configure OAuth client library
     const enodeIssuer = await Issuer.discover(config.get("oauthUrl"));
 
     const client = new enodeIssuer.Client({
-      client_id: config.get("clientId"),
-      client_secret: config.get("clientSecret"),
+      client_id,
+      client_secret,
       redirect_uris: [config.get("callbackUrl")],
       response_types: ["code"],
     });
