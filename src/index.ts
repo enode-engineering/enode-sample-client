@@ -67,8 +67,9 @@ async function createClient() {
       const user = req.session!.user;
 
       const validLangs = ["en", "nb", "de", "sv"];
-      const queryLang = req.query.lang as string;
+      const lang = req.query.forceLanguage as string;
       const hideBranding = req.query.hideBranding as string;
+      const vendor = req.query.vendor as string;
 
       // Create an Enode Link session for the user
       const clientGrant = await client.grant({
@@ -80,11 +81,14 @@ async function createClient() {
         userImage: user.image,
         linkMultiple: false,
       };
-      if (queryLang && validLangs.includes(queryLang)) {
-        linkSessionDetails.forceLanguage = queryLang;
+      if (lang && validLangs.includes(lang)) {
+        linkSessionDetails.forceLanguage = lang;
       }
       if (hideBranding) {
         linkSessionDetails.hideBranding = true;
+      }
+      if (vendor) {
+        linkSessionDetails.vendor = vendor;
       }
 
       const body: LinkUserResponseBody = await got
