@@ -13,6 +13,7 @@ interface LinkSessionDetails {
   linkMultiple: boolean;
   forceLanguage?: string;
   hideBranding?: boolean;
+  vendor?: string;
 }
 
 async function createClient() {
