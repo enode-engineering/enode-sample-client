@@ -12,6 +12,7 @@ interface LinkSessionDetails {
   userImage: string;
   linkMultiple: boolean;
   forceLanguage?: string;
+  hideBranding?: boolean;
 }
 
 async function createClient() {
@@ -67,6 +68,7 @@ async function createClient() {
 
       const validLangs = ["en", "nb", "de", "sv"];
       const queryLang = req.query.lang as string;
+      const hideBranding = req.query.hideBranding as string;
 
       // Create an Enode Link session for the user
       const clientGrant = await client.grant({
@@ -80,6 +82,9 @@ async function createClient() {
       };
       if (queryLang && validLangs.includes(queryLang)) {
         linkSessionDetails.forceLanguage = queryLang;
+      }
+      if (hideBranding) {
+        linkSessionDetails.hideBranding = true;
       }
 
       const body: LinkUserResponseBody = await got
