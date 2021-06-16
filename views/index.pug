@@ -27,8 +27,10 @@ html
         form(action="/refresh" method="post")
           input(type="hidden" name="refreshToken" value=tokens.refresh_token)
           input(type="submit" value="Refresh Tokens")
-    a(href="/link")
+    a(href="/link?vendorType=vehicle")
       button Connect Your Car
+    a(href="/link?vendorType=charger")
+      button Connect Your Charger
     if tokens
       h3 OAuth Tokens
       pre= JSON.stringify(tokens, null, 4)
