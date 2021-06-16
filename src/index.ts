@@ -14,6 +14,7 @@ interface LinkSessionDetails {
   forceLanguage?: string;
   hideBranding?: boolean;
   vendor?: string;
+  vendorType?: string;
 }
 
 async function createClient() {
@@ -71,6 +72,7 @@ async function createClient() {
       const lang = req.query.forceLanguage as string;
       const hideBranding = req.query.hideBranding as string;
       const vendor = req.query.vendor as string;
+      const vendorType = req.query.vendorType as string;
 
       // Create an Enode Link session for the user
       const clientGrant = await client.grant({
@@ -90,6 +92,9 @@ async function createClient() {
       }
       if (vendor) {
         linkSessionDetails.vendor = vendor;
+      }
+      if (vendorType) {
+        linkSessionDetails.vendorType = vendorType;
       }
 
       const body: LinkUserResponseBody = await got
