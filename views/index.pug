@@ -13,7 +13,7 @@ html
         width: 100px;
       }
   body
-    h1 🧠⚡️ Power Company
+    h1 🧠⚡️ Power Company 
     p You have been signed into a randomly generated user account for testing purposes.
     h3 Authenticated User:
     pre
@@ -40,6 +40,15 @@ html
       each vehicle,i in vehicles
         h4=`${vehicle.information.year} ${vehicle.information.brand} ${vehicle.information.model}`
         pre= JSON.stringify(vehicle, null, 4)
-    if vehiclesError
+    if chargers 
+      h3 chargers:  
+      each charger, i in chargers
+        h4=`${charger.id}`
+        pre= JSON.stringify(charger, null, 4)
+    h2 errors
+    if vehicleError
       h3 Error fetching vehicles
-      pre= vehiclesError
+      pre=vehicleError
+    if chargerError
+      h3 Error fetching chargers
+      pre=chargerError
