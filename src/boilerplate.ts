@@ -2,7 +2,7 @@ import express from "express";
 import cookieSession from "cookie-session";
 import faker from "faker";
 import path from "path";
-import { listVehicles } from "./enode";
+import { getCharger, listChargers, listVehicles } from "./enode";
 
 const app = express();
 app.set("view engine", "pug");
@@ -38,14 +38,27 @@ app.use((req, res, next) => {
 
 app.get("/", async (req, res) => {
   let vehicles: any[] | null = null;
-  let vehiclesError: any = null;
+  
+  let chargerIDs: any[] | null = null;
+  let chargers: any[] | null = null;
+  
+  let vehicleError: any = null;
+  let chargerError: any = null;
 
   if (req.session?.tokens) {
     try {
+
+      chargerIDs = await listChargers(req.session.tokens.access_token);
+      chargers = await Promise.all(chargerIDs.map((id: string) => getCharger(req.session?.tokens.access_token, id)))
+    } catch (error) {
+      console.error(error); 
+      chargerError = error.toString(); 
+    }
+    try {
       vehicles = await listVehicles(req.session.tokens.access_token);
-    } catch (e) {
-      console.error(e);
-      vehiclesError = e.toString();
+    } catch (error) {
+      console.error(error);
+      vehicleError = error.toString();
     }
   }
 
@@ -56,7 +69,9 @@ app.get("/", async (req, res) => {
     image: req.session?.user.image,
     tokens: req.session?.tokens,
     vehicles,
-    vehiclesError,
+    chargers,
+    vehicleError, 
+    chargerError
   });
 });
 
