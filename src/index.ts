@@ -152,7 +152,7 @@ async function createClient() {
       } catch (e) {
         req.session!.tokens = e;
       }
-      res.redirect(`/?linkState=${encodeURIComponent(linkState)}`);
+      res.redirect("/");
     });
 
     app.post("/refresh", async (req, res) => {

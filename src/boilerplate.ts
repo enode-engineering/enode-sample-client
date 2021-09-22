@@ -71,7 +71,6 @@ app.get("/", async (req, res) => {
     lastName: req.session?.user.lastName,
     image: req.session?.user.image,
     tokens: req.session?.tokens,
-    linkState: req.query.linkState,
     vehicles,
     chargers,
     vehicleError,
