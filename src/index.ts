@@ -1,6 +1,7 @@
 import config from "config";
+import * as express from "express";
 import got from "got";
-import { Issuer } from "openid-client";
+import { Issuer, Client } from "openid-client";
 import app from "./boilerplate";
 
 interface LinkUserResponseBody {
@@ -15,6 +16,50 @@ interface LinkSessionDetails {
   hideBranding?: boolean;
   vendor?: string;
   vendorType?: string;
+}
+
+async function getLinkState(req: express.Request, client: Client) {
+  const user = req.session!.user;
+
+  const validLangs = ["en", "nb", "de", "sv"];
+  const lang = req.query.forceLanguage as string;
+  const hideBranding = req.query.hideBranding as string;
+  const vendor = req.query.vendor as string;
+  const vendorType = req.query.vendorType as string;
+
+  // Create an Enode Link session for the user
+  const clientGrant = await client.grant({
+    grant_type: "client_credentials",
+  });
+
+  const linkSessionDetails: LinkSessionDetails = {
+    userName: `${user.firstName} ${user.lastName}`,
+    userImage: user.image,
+    linkMultiple: false,
+  };
+  if (lang && validLangs.includes(lang)) {
+    linkSessionDetails.forceLanguage = lang;
+  }
+  if (hideBranding) {
+    linkSessionDetails.hideBranding = true;
+  }
+  if (vendor) {
+    linkSessionDetails.vendor = vendor;
+  }
+  if (vendorType) {
+    linkSessionDetails.vendorType = vendorType;
+  }
+
+  const body: LinkUserResponseBody = await got
+    .post(`${config.get("apiUrl")}/users/${user.id}/link`, {
+      headers: {
+        Authorization: `Bearer ${clientGrant.access_token}`,
+      },
+      json: linkSessionDetails,
+    })
+    .json();
+  const linkState = body.linkState;
+  return linkState;
 }
 
 async function createClient() {
@@ -65,47 +110,13 @@ async function createClient() {
       response_types: ["code"],
     });
 
+    app.get("/linkState", async (req, res) => {
+      const linkState = await getLinkState(req, client);
+      return res.status(200).send({ linkState });
+    });
+
     app.get("/link", async (req, res) => {
-      const user = req.session!.user;
-
-      const validLangs = ["en", "nb", "de", "sv"];
-      const lang = req.query.forceLanguage as string;
-      const hideBranding = req.query.hideBranding as string;
-      const vendor = req.query.vendor as string;
-      const vendorType = req.query.vendorType as string;
-
-      // Create an Enode Link session for the user
-      const clientGrant = await client.grant({
-        grant_type: "client_credentials",
-      });
-
-      const linkSessionDetails: LinkSessionDetails = {
-        userName: `${user.firstName} ${user.lastName}`,
-        userImage: user.image,
-        linkMultiple: false,
-      };
-      if (lang && validLangs.includes(lang)) {
-        linkSessionDetails.forceLanguage = lang;
-      }
-      if (hideBranding) {
-        linkSessionDetails.hideBranding = true;
-      }
-      if (vendor) {
-        linkSessionDetails.vendor = vendor;
-      }
-      if (vendorType) {
-        linkSessionDetails.vendorType = vendorType;
-      }
-
-      const body: LinkUserResponseBody = await got
-        .post(`${config.get("apiUrl")}/users/${user.id}/link`, {
-          headers: {
-            Authorization: `Bearer ${clientGrant.access_token}`,
-          },
-          json: linkSessionDetails,
-        })
-        .json();
-      const linkState = body.linkState;
+      const linkState = await getLinkState(req, client);
 
       // Persist linkState to user's session
       req.session!.linkState = linkState;
