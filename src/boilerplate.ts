@@ -38,21 +38,24 @@ app.use((req, res, next) => {
 
 app.get("/", async (req, res) => {
   let vehicles: any[] | null = null;
-  
+
   let chargerIDs: any[] | null = null;
   let chargers: any[] | null = null;
-  
+
   let vehicleError: any = null;
   let chargerError: any = null;
 
   if (req.session?.tokens) {
     try {
-
       chargerIDs = await listChargers(req.session.tokens.access_token);
-      chargers = await Promise.all(chargerIDs.map((id: string) => getCharger(req.session?.tokens.access_token, id)))
+      chargers = await Promise.all(
+        chargerIDs.map((id: string) =>
+          getCharger(req.session?.tokens.access_token, id),
+        ),
+      );
     } catch (error) {
-      console.error(error); 
-      chargerError = error.toString(); 
+      console.error(error);
+      chargerError = error.toString();
     }
     try {
       vehicles = await listVehicles(req.session.tokens.access_token);
@@ -68,10 +71,11 @@ app.get("/", async (req, res) => {
     lastName: req.session?.user.lastName,
     image: req.session?.user.image,
     tokens: req.session?.tokens,
+    linkState: req.query.linkState,
     vehicles,
     chargers,
-    vehicleError, 
-    chargerError
+    vehicleError,
+    chargerError,
   });
 });
 
